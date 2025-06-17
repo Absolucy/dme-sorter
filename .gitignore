@@ -1,0 +1,4 @@
+/target
+/wasi/*
+!/wasi/main.c
+.clangd

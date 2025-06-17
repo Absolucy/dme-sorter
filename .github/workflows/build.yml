@@ -1,0 +1,78 @@
+name: "Build"
+on:
+    push:
+    pull_request:
+env:
+    CARGO_TERM_COLOR: always
+jobs:
+    build-cosmo:
+        name: Universal (APE) Build
+        runs-on: ubuntu-latest
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}-cosmo
+            cancel-in-progress: true
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+            - name: Setup cosmocc
+              run: bash scripts/setup_cosmo.sh
+            - name: Setup w2c2
+              run: bash scripts/setup_w2c2.sh
+            - name: Install Rust Toolchain
+              uses: actions-rust-lang/setup-rust-toolchain@v1
+              with:
+                  target: wasm32-wasip1
+            - name: Build WASI Module (release)
+              run: cargo build --release --locked --target wasm32-wasip1
+            - name: Run w2c2
+              run: |
+                  cp target/wasm32-wasip1/release/dme-sorter.wasm wasi/dme-sorter.wasm
+                  cd wasi
+                  /opt/w2c2/w2c2/build/w2c2 dme-sorter.wasm dme-sorter.c
+            - name: Build Universal (APE) Binary
+              run: /opt/cosmocc/bin/cosmocc -Os -DNDEBUG -Wno-everything -I "/opt/w2c2/w2c2" -I "/opt/w2c2" -L "/opt/w2c2/wasi/build" wasi/main.c wasi/dme-sorter.c -lw2c2wasi -o wasi/dme-sorter.com
+            - name: Upload Build
+              uses: actions/upload-artifact@v4
+              with:
+                  name: dme-sorter-cosmo
+                  path: wasi/dme-sorter.com
+    build-windows:
+        name: Windows Build
+        runs-on: windows-latest
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}-windows
+            cancel-in-progress: true
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+            - name: Install Rust Toolchain
+              uses: actions-rust-lang/setup-rust-toolchain@v1
+            - name: Build (release)
+              run: cargo build --release --locked --target x86_64-pc-windows-msvc --features vc-ltl
+            - name: Upload Build
+              uses: actions/upload-artifact@v4
+              with:
+                  name: build-windows
+                  path: target/x86_64-pc-windows-msvc/release/dme-sorter.exe
+    build-linux:
+        name: Linux Build
+        runs-on: ubuntu-latest
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}-linux
+            cancel-in-progress: true
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+            - name: Install Rust Toolchain
+              uses: actions-rust-lang/setup-rust-toolchain@v1
+              with:
+                  target: x86_64-unknown-linux-musl
+            - name: Install cargo-zigbuild
+              run: pip install cargo-zigbuild
+            - name: Build (release)
+              run: cargo zigbuild --release --locked --target x86_64-unknown-linux-musl
+            - name: Upload Build
+              uses: actions/upload-artifact@v4
+              with:
+                  name: build-linux
+                  path: target/x86_64-unknown-linux-musl/release/dme-sorter
