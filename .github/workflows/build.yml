@@ -1,7 +1,21 @@
 name: "Build"
 on:
     push:
+        paths:
+            - "src/**"
+            - "wasi/**"
+            - "scripts/*.sh"
+            - "Cargo.toml"
+            - "Cargo.lock"
+            - ".github/workflows/build.yml"
     pull_request:
+        paths:
+            - "src/**"
+            - "wasi/**"
+            - "scripts/*.sh"
+            - "Cargo.toml"
+            - "Cargo.lock"
+            - ".github/workflows/build.yml"
 env:
     CARGO_TERM_COLOR: always
 jobs:
