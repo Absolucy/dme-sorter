@@ -3,6 +3,8 @@ name = "dme-sorter"
 version = "0.1.0"
 edition = "2024"
 authors = ["Lucy <lucy@absolucy.moe>"]
+license = "0BSD"
+repository = "https://github.com/Absolucy/dme-sorter"
 
 [lints.clippy]
 # presets

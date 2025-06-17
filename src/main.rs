@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: 0BSD
 use std::{borrow::Cow, cmp::Ordering, path::PathBuf};
 
 const FILE_EXTENSIONS: &[&str] = &["dm", "dmf"];
