@@ -7,11 +7,11 @@ fn is_file(segment: &str) -> bool {
 	FILE_EXTENSIONS.iter().any(|ext| segment.ends_with(ext))
 }
 
-fn strip_include(line: &str) -> Cow<'_, str> {
+fn strip_include(line: &str, lowercase: bool) -> Cow<'_, str> {
 	let line = line.trim();
 	let line = line.strip_prefix("#include \"").unwrap_or(line);
 	let line = line.strip_suffix('"').unwrap_or(line);
-	if line.chars().any(|c| c.is_alphabetic() && !c.is_lowercase()) {
+	if lowercase && line.chars().any(|c| c.is_alphabetic() && !c.is_lowercase()) {
 		Cow::Owned(line.to_lowercase())
 	} else {
 		Cow::Borrowed(line)
@@ -23,8 +23,8 @@ fn suffix(path: &str) -> &str {
 }
 
 fn compare_lines(a: &str, b: &str) -> Ordering {
-	let a = strip_include(a);
-	let b = strip_include(b);
+	let a = strip_include(a, true);
+	let b = strip_include(b, true);
 
 	let a_suffix = suffix(&a);
 	let b_suffix = suffix(&b);
@@ -171,8 +171,8 @@ fn main() {
 		after,
 	} = dme_includes(&file);
 	includes.retain(|file| {
-		let file = strip_include(file);
-		if !base_dir.join(file.as_ref()).exists() {
+		let file = strip_include(file, false);
+		if !base_dir.join(file.replace('\\', "/")).exists() {
 			eprintln!("{file} did not exist, removing");
 			false
 		} else {
