@@ -43,6 +43,6 @@ checksum = "32a282da65faaf38286cf3be983213fcf1d2e2a58700e808f83f4ea9a4804bc0"
 
 [[package]]
 name = "vc-ltl"
-version = "5.2.2-Beta1"
+version = "5.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8cd8c4c994abc38abb8d322257f73fb51176d5c7d0b28323adbecaf2f6a7b189"
+checksum = "952e87999b59993e0bd8a02c65abff374daf3f44a1643c414f93dbab6d03c052"

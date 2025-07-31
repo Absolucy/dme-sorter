@@ -25,7 +25,7 @@ string_to_string = "warn"
 
 [dependencies]
 imara-diff = { version = "0.2", optional = true }
-vc-ltl = { version = "5.2.2-Beta1", optional = true }
+vc-ltl = { version = "5", optional = true }
 
 [profile.release]
 lto = "thin"
